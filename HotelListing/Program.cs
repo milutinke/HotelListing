@@ -1,3 +1,5 @@
+using HotelListing.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
@@ -10,12 +12,12 @@ namespace HotelListing
         {
             try
             {
-                Log.Information("Application starting...");
-
                 var builder = WebApplication.CreateBuilder(args);
 
-                // Logging
-                builder.Host.UseSerilog((ctx, lc) => lc.ReadFrom.Configuration(ctx.Configuration));
+                // Db Connection
+                builder.Services.AddDbContext<DatabaseContext>(options =>
+                   options.UseSqlServer(builder.Configuration.GetConnectionString("sqlConnection"))
+                );
 
                 // Add services to the container.
 
@@ -26,6 +28,11 @@ namespace HotelListing
                 {
                     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Hotel Listing", Version = "v1" });
                 });
+
+                // Logging
+                builder.Host.UseSerilog((ctx, lc) => lc.ReadFrom.Configuration(ctx.Configuration));
+
+                Log.Information("Appliction Is Starting");
 
                 var app = builder.Build();
 
@@ -47,6 +54,7 @@ namespace HotelListing
 
                 app.Run();
 
+                Log.Information("Connection String: " + builder.Configuration.GetConnectionString("sqlConnection"));
             }
             catch (Exception e)
             {
