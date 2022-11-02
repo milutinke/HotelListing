@@ -1,3 +1,4 @@
+using HotelListing.Configurations;
 using HotelListing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -21,8 +22,22 @@ namespace HotelListing
 
                 // Add services to the container.
 
+                // Auto-Mapper
+                builder.Services.AddAutoMapper(typeof(MapperInitializer));
+
+                // CORS
+                builder.Services.AddCors(o =>
+                {
+                    o.AddPolicy("AllowAll", builder =>
+                        builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                    );
+                });
+
                 builder.Services.AddControllers();
-                // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+                // Swagger
                 builder.Services.AddEndpointsApiExplorer();
                 builder.Services.AddSwaggerGen(c =>
                 {
@@ -35,9 +50,6 @@ namespace HotelListing
                 Log.Information("Appliction Is Starting");
 
                 var app = builder.Build();
-
-                // CORS
-                app.UseCors("AllowAll");
 
                 // Configure the HTTP request pipeline.
                 if (app.Environment.IsDevelopment())
