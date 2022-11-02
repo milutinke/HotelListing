@@ -1,5 +1,7 @@
 using HotelListing.Configurations;
 using HotelListing.Data;
+using HotelListing.IRepository;
+using HotelListing.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -22,6 +24,8 @@ namespace HotelListing
 
                 // Add services to the container.
 
+                builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+
                 // Auto-Mapper
                 builder.Services.AddAutoMapper(typeof(MapperInitializer));
 
@@ -35,7 +39,9 @@ namespace HotelListing
                     );
                 });
 
-                builder.Services.AddControllers();
+                builder.Services.AddControllers().AddNewtonsoftJson(options =>
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
 
                 // Swagger
                 builder.Services.AddEndpointsApiExplorer();
